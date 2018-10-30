@@ -1,0 +1,36 @@
+{
+  "name": "pointer-tracker",
+  "version": "1.0.0",
+  "description": "Track mouse/touch/pointer events through one interface",
+  "main": "dist/PointerTracker.js",
+  "module": "dist/PointerTracker.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GoogleChromeLabs/pointer-tracker.git"
+  },
+  "keywords": [
+    "pointer",
+    "touch",
+    "mouse",
+    "event"
+  ],
+  "author": "Jake Archibald",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GoogleChromeLabs/pointer-tracker/issues"
+  },
+  "homepage": "https://github.com/GoogleChromeLabs/pointer-tracker#readme",
+  "devDependencies": {
+    "rollup": "^0.66.6",
+    "rollup-plugin-terser": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.17.2",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^3.1.4"
+  }
+}
