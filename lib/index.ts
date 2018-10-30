@@ -124,6 +124,14 @@ export default class PointerTracker {
     this._moveCallback = move;
     this._endCallback = end;
 
+    // Bind methods
+    this._pointerStart = this._pointerStart.bind(this);
+    this._touchStart = this._touchStart.bind(this);
+    this._move = this._move.bind(this);
+    this._triggerPointerEnd = this._triggerPointerEnd.bind(this);
+    this._pointerEnd = this._pointerEnd.bind(this);
+    this._touchEnd = this._touchEnd.bind(this);
+
     // Add listeners
     if (self.PointerEvent) {
       this._element.addEventListener('pointerdown', this._pointerStart);
@@ -133,14 +141,6 @@ export default class PointerTracker {
       this._element.addEventListener('touchmove', this._move);
       this._element.addEventListener('touchend', this._touchEnd);
     }
-
-    // Bind methods
-    this._pointerStart = this._pointerStart.bind(this);
-    this._touchStart = this._touchStart.bind(this);
-    this._move = this._move.bind(this);
-    this._triggerPointerEnd = this._triggerPointerEnd.bind(this);
-    this._pointerEnd = this._pointerEnd.bind(this);
-    this._touchEnd = this._touchEnd.bind(this);
   }
 
   /**
