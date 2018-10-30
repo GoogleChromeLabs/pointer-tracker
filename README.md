@@ -55,7 +55,13 @@ pointer.clientY;
 pointer.id;
 // The platform object used to create this Pointer
 pointer.nativePointer;
+// Returns an expanded set of Pointers for high-resolution inputs.
+const pointers = pointer.getCoalesced();
 ```
+
+## Demo
+
+[A simple painting app](https://pointer-tracker-demo.glitch.me/) ([code](https://glitch.com/edit/#!/pointer-tracker-demo?path=public/index.html)).
 
 ## Files
 
