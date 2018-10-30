@@ -1,9 +1,9 @@
-var PointerTracker = (function (exports) {
+var PointerTracker = (function () {
     'use strict';
 
     class Pointer {
         constructor(nativePointer) {
-            /** ID for this pointer */
+            /** Unique ID for this pointer */
             this.id = -1;
             this.nativePointer = nativePointer;
             this.pageX = nativePointer.pageX;
@@ -185,9 +185,6 @@ var PointerTracker = (function (exports) {
         }
     }
 
-    exports.Pointer = Pointer;
-    exports.PointerTracker = PointerTracker;
+    return PointerTracker;
 
-    return exports;
-
-}({}));
+}());

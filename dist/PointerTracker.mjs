@@ -1,6 +1,6 @@
 class Pointer {
     constructor(nativePointer) {
-        /** ID for this pointer */
+        /** Unique ID for this pointer */
         this.id = -1;
         this.nativePointer = nativePointer;
         this.pageX = nativePointer.pageX;
@@ -182,4 +182,4 @@ class PointerTracker {
     }
 }
 
-export { Pointer, PointerTracker };
+export default PointerTracker;

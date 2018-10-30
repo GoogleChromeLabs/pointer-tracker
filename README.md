@@ -59,7 +59,7 @@ pointer.nativePointer;
 
 ## Files
 
-* `lib/index.ts` - Original typescript.
+* `lib/index.ts` - Original TypeScript.
 * `dist/PointerTracker.mjs` - JS module. Default exports PointerTracker.
 * `dist/PointerTracker.js` - Plain JS. Exposes PointerTracker on the global.
 * `dist/PointerTracker-min.js` - Minified plain JS. ~800 bytes gzipped.

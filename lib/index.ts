@@ -1,6 +1,6 @@
 const enum Button { Left }
 
-export class Pointer {
+class Pointer {
   /** x offset from the top of the document */
   pageX: number;
   /** y offset from the top of the document */
@@ -9,7 +9,7 @@ export class Pointer {
   clientX: number;
   /** y offset from the top of the viewport */
   clientY: number;
-  /** ID for this pointer */
+  /** Unique ID for this pointer */
   id: number = -1;
   /** The platform object used to create this Pointer */
   nativePointer: Touch | PointerEvent | MouseEvent;
@@ -38,6 +38,10 @@ export class Pointer {
     return [this];
   }
 }
+
+// Export the typing, but keep the class private.
+type PointerType = Pointer;
+export { PointerType as Pointer };
 
 const isPointerEvent = (event: any): event is PointerEvent =>
   self.PointerEvent && event instanceof PointerEvent;
@@ -88,7 +92,7 @@ interface PointerTrackerCallbacks {
 /**
  * Track pointers across a particular element
  */
-export class PointerTracker {
+export default class PointerTracker {
   /**
    * State of the tracked pointers when they were pressed/touched.
    */

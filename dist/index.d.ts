@@ -1,4 +1,4 @@
-export declare class Pointer {
+declare class Pointer {
     /** x offset from the top of the document */
     pageX: number;
     /** y offset from the top of the document */
@@ -7,7 +7,7 @@ export declare class Pointer {
     clientX: number;
     /** y offset from the top of the viewport */
     clientY: number;
-    /** ID for this pointer */
+    /** Unique ID for this pointer */
     id: number;
     /** The platform object used to create this Pointer */
     nativePointer: Touch | PointerEvent | MouseEvent;
@@ -17,6 +17,8 @@ export declare class Pointer {
      */
     getCoalesced(): Pointer[];
 }
+declare type PointerType = Pointer;
+export { PointerType as Pointer };
 export declare type InputEvent = TouchEvent | PointerEvent | MouseEvent;
 declare type StartCallback = (pointer: Pointer, event: InputEvent) => boolean;
 declare type MoveCallback = (previousPointers: Pointer[], changedPointers: Pointer[], event: InputEvent) => void;
@@ -55,7 +57,7 @@ interface PointerTrackerCallbacks {
 /**
  * Track pointers across a particular element
  */
-export declare class PointerTracker {
+export default class PointerTracker {
     private _element;
     /**
      * State of the tracked pointers when they were pressed/touched.
@@ -120,4 +122,3 @@ export declare class PointerTracker {
      */
     private _touchEnd;
 }
-export {};
