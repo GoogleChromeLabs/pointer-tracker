@@ -170,10 +170,10 @@ export default class PointerTracker {
     // Add listeners for additional events.
     // The listeners may already exist, but no harm in adding them again.
     if (isPointerEvent(event)) {
-      const capturingElement = event.target ?? this._element;
-      if (!(capturingElement instanceof Element)) {
-        throw new Error('Expected the event target to be an Element.');
-      }
+      const capturingElement =
+        event.target && 'setPointerCapture' in event.target
+          ? event.target
+          : this._element;
       capturingElement.setPointerCapture(event.pointerId);
       this._element.addEventListener('pointermove', this._move);
       this._element.addEventListener('pointerup', this._pointerEnd);
