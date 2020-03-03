@@ -150,6 +150,21 @@ export default class PointerTracker {
   }
 
   /**
+   * Remove all listeners.
+   */
+  stop() {
+    this._element.addEventListener('pointerdown', this._pointerStart);
+    this._element.addEventListener('mousedown', this._pointerStart);
+    this._element.addEventListener('touchstart', this._touchStart);
+    this._element.addEventListener('touchmove', this._move);
+    this._element.addEventListener('touchend', this._touchEnd);
+    this._element.addEventListener('pointermove', this._move);
+    this._element.addEventListener('pointerup', this._pointerEnd);
+    window.addEventListener('mousemove', this._move);
+    window.addEventListener('mouseup', this._pointerEnd);
+  }
+
+  /**
    * Call the start callback for this pointer, and track it if the user wants.
    *
    * @param pointer Pointer

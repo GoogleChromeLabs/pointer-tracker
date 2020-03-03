@@ -36,6 +36,8 @@ pointerTracker.startPointers;
 // Latest state of the tracked pointers. Contains the same number of pointers, and in the same order
 // as this.startPointers.
 pointerTracker.currentPointers;
+// Remove all listeners. Call this when you're done tracking.
+pointerTracker.stop();
 ```
 
 ### Pointer

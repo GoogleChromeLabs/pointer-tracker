@@ -79,6 +79,10 @@ export default class PointerTracker {
      */
     constructor(_element: HTMLElement, callbacks: PointerTrackerCallbacks);
     /**
+     * Remove all listeners.
+     */
+    stop(): void;
+    /**
      * Call the start callback for this pointer, and track it if the user wants.
      *
      * @param pointer Pointer
@@ -87,20 +91,19 @@ export default class PointerTracker {
      */
     private _triggerPointerStart;
     /**
-     * Listener for mouse/pointer starts. Bound to the class in the constructor.
+     * Listener for mouse/pointer starts.
      *
      * @param event This will only be a MouseEvent if the browser doesn't support
      * pointer events.
      */
     private _pointerStart;
     /**
-     * Listener for touchstart. Bound to the class in the constructor.
+     * Listener for touchstart.
      * Only used if the browser doesn't support pointer events.
      */
     private _touchStart;
     /**
      * Listener for pointer/mouse/touch move events.
-     * Bound to the class in the constructor.
      */
     private _move;
     /**
@@ -111,13 +114,14 @@ export default class PointerTracker {
      */
     private _triggerPointerEnd;
     /**
-     * Listener for mouse/pointer ends. Bound to the class in the constructor.
+     * Listener for mouse/pointer ends.
+     *
      * @param event This will only be a MouseEvent if the browser doesn't support
      * pointer events.
      */
     private _pointerEnd;
     /**
-     * Listener for touchend. Bound to the class in the constructor.
+     * Listener for touchend.
      * Only used if the browser doesn't support pointer events.
      */
     private _touchEnd;
