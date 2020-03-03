@@ -1,4 +1,18 @@
-const enum Button { Left }
+/**
+ * Copyright 2020 Google Inc. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const enum Button {
+  Left,
+}
 
 class Pointer {
   /** x offset from the top of the document */
@@ -14,7 +28,7 @@ class Pointer {
   /** The platform object used to create this Pointer */
   nativePointer: Touch | PointerEvent | MouseEvent;
 
-  constructor (nativePointer: Touch | PointerEvent | MouseEvent) {
+  constructor(nativePointer: Touch | PointerEvent | MouseEvent) {
     this.nativePointer = nativePointer;
     this.pageX = nativePointer.pageX;
     this.pageY = nativePointer.pageY;
@@ -23,7 +37,8 @@ class Pointer {
 
     if (self.Touch && nativePointer instanceof Touch) {
       this.id = nativePointer.identifier;
-    } else if (isPointerEvent(nativePointer)) { // is PointerEvent
+    } else if (isPointerEvent(nativePointer)) {
+      // is PointerEvent
       this.id = nativePointer.pointerId;
     }
   }
@@ -113,24 +128,15 @@ export default class PointerTracker {
    * @param element Element to monitor.
    * @param callbacks
    */
-  constructor (private _element: HTMLElement, callbacks: PointerTrackerCallbacks) {
-    const {
-      start = () => true,
-      move = noop,
-      end = noop,
-    } = callbacks;
+  constructor(
+    private _element: HTMLElement,
+    callbacks: PointerTrackerCallbacks,
+  ) {
+    const { start = () => true, move = noop, end = noop } = callbacks;
 
     this._startCallback = start;
     this._moveCallback = move;
     this._endCallback = end;
-
-    // Bind methods
-    this._pointerStart = this._pointerStart.bind(this);
-    this._touchStart = this._touchStart.bind(this);
-    this._move = this._move.bind(this);
-    this._triggerPointerEnd = this._triggerPointerEnd.bind(this);
-    this._pointerEnd = this._pointerEnd.bind(this);
-    this._touchEnd = this._touchEnd.bind(this);
 
     // Add listeners
     if (self.PointerEvent) {
@@ -158,12 +164,12 @@ export default class PointerTracker {
   }
 
   /**
-   * Listener for mouse/pointer starts. Bound to the class in the constructor.
+   * Listener for mouse/pointer starts.
    *
    * @param event This will only be a MouseEvent if the browser doesn't support
    * pointer events.
    */
-  private _pointerStart(event: PointerEvent | MouseEvent) {
+  private _pointerStart = (event: PointerEvent | MouseEvent) => {
     if (event.button !== Button.Left) return;
     if (!this._triggerPointerStart(new Pointer(event), event)) return;
 
@@ -174,34 +180,36 @@ export default class PointerTracker {
         event.target && 'setPointerCapture' in event.target
           ? event.target
           : this._element;
+
       capturingElement.setPointerCapture(event.pointerId);
       this._element.addEventListener('pointermove', this._move);
       this._element.addEventListener('pointerup', this._pointerEnd);
-    } else { // MouseEvent
+    } else {
+      // MouseEvent
       window.addEventListener('mousemove', this._move);
       window.addEventListener('mouseup', this._pointerEnd);
     }
-  }
+  };
 
   /**
-   * Listener for touchstart. Bound to the class in the constructor.
+   * Listener for touchstart.
    * Only used if the browser doesn't support pointer events.
    */
-  private _touchStart(event: TouchEvent) {
+  private _touchStart = (event: TouchEvent) => {
     for (const touch of Array.from(event.changedTouches)) {
       this._triggerPointerStart(new Pointer(touch), event);
     }
-  }
+  };
 
   /**
    * Listener for pointer/mouse/touch move events.
-   * Bound to the class in the constructor.
    */
-  private _move(event: PointerEvent | MouseEvent | TouchEvent) {
+  private _move = (event: PointerEvent | MouseEvent | TouchEvent) => {
     const previousPointers = this.currentPointers.slice();
-    const changedPointers = ('changedTouches' in event) ? // Shortcut for 'is touch event'.
-      Array.from(event.changedTouches).map(t => new Pointer(t)) :
-      [new Pointer(event)];
+    const changedPointers =
+      'changedTouches' in event // Shortcut for 'is touch event'.
+        ? Array.from(event.changedTouches).map(t => new Pointer(t))
+        : [new Pointer(event)];
     const trackedChangedPointers = [];
 
     for (const pointer of changedPointers) {
@@ -214,7 +222,7 @@ export default class PointerTracker {
     if (trackedChangedPointers.length === 0) return;
 
     this._moveCallback(previousPointers, trackedChangedPointers, event);
-  }
+  };
 
   /**
    * Call the end callback for this pointer.
@@ -222,7 +230,10 @@ export default class PointerTracker {
    * @param pointer Pointer
    * @param event Related event
    */
-  private _triggerPointerEnd(pointer: Pointer, event: InputEvent): boolean {
+  private _triggerPointerEnd = (
+    pointer: Pointer,
+    event: InputEvent,
+  ): boolean => {
     const index = this.currentPointers.findIndex(p => p.id === pointer.id);
     // Not a pointer we're interested in?
     if (index === -1) return false;
@@ -232,33 +243,35 @@ export default class PointerTracker {
 
     this._endCallback(pointer, event);
     return true;
-  }
+  };
 
   /**
-   * Listener for mouse/pointer ends. Bound to the class in the constructor.
+   * Listener for mouse/pointer ends.
+   *
    * @param event This will only be a MouseEvent if the browser doesn't support
    * pointer events.
    */
-  private _pointerEnd(event: PointerEvent | MouseEvent) {
+  private _pointerEnd = (event: PointerEvent | MouseEvent) => {
     if (!this._triggerPointerEnd(new Pointer(event), event)) return;
 
     if (isPointerEvent(event)) {
       if (this.currentPointers.length) return;
       this._element.removeEventListener('pointermove', this._move);
       this._element.removeEventListener('pointerup', this._pointerEnd);
-    } else { // MouseEvent
+    } else {
+      // MouseEvent
       window.removeEventListener('mousemove', this._move);
       window.removeEventListener('mouseup', this._pointerEnd);
     }
-  }
+  };
 
   /**
-   * Listener for touchend. Bound to the class in the constructor.
+   * Listener for touchend.
    * Only used if the browser doesn't support pointer events.
    */
-  private _touchEnd(event: TouchEvent) {
+  private _touchEnd = (event: TouchEvent) => {
     for (const touch of Array.from(event.changedTouches)) {
       this._triggerPointerEnd(new Pointer(touch), event);
     }
-  }
+  };
 }

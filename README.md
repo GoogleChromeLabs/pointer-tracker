@@ -28,7 +28,7 @@ const pointerTracker = new PointerTracker(element, {
     // pointer - The final state of the pointer that ended. This pointer is now absent from
     //    this.currentPointers and this.startPointers.
     // event - The event related to this pointer.
-  }
+  },
 });
 
 // State of the tracked pointers when they were pressed/touched.
@@ -65,7 +65,7 @@ const pointers = pointer.getCoalesced();
 
 ## Files
 
-* `lib/index.ts` - Original TypeScript.
-* `dist/PointerTracker.mjs` - JS module. Default exports PointerTracker.
-* `dist/PointerTracker.js` - Plain JS. Exposes PointerTracker on the global.
-* `dist/PointerTracker-min.js` - Minified plain JS. ~800 bytes gzipped.
+- `lib/index.ts` - Original TypeScript.
+- `dist/PointerTracker.mjs` - JS module. Default exports PointerTracker.
+- `dist/PointerTracker.js` - Plain JS. Exposes PointerTracker on the global.
+- `dist/PointerTracker-min.js` - Minified plain JS. ~800 bytes gzipped.
