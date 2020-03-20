@@ -70,14 +70,18 @@ type MoveCallback = (
   changedPointers: Pointer[],
   event: InputEvent,
 ) => void;
-type EndCallback = (pointer: Pointer, event: InputEvent) => void;
+type EndCallback = (
+  pointer: Pointer,
+  event: InputEvent,
+  cancelled: boolean,
+) => void;
 
 interface PointerTrackerCallbacks {
   /**
    * Called when a pointer is pressed/touched within the element.
    *
-   * @param pointer The new pointer.
-   * This pointer isn't included in this.currentPointers or this.startPointers yet.
+   * @param pointer The new pointer. This pointer isn't included in this.currentPointers or
+   * this.startPointers yet.
    * @param event The event related to this pointer.
    *
    * @returns Whether you want to track this pointer as it moves.
@@ -86,9 +90,8 @@ interface PointerTrackerCallbacks {
   /**
    * Called when pointers have moved.
    *
-   * @param previousPointers The state of the pointers before this event.
-   * This contains the same number of pointers, in the same order, as
-   * this.currentPointers and this.startPointers.
+   * @param previousPointers The state of the pointers before this event. This contains the same
+   * number of pointers, in the same order, as this.currentPointers and this.startPointers.
    * @param changedPointers The pointers that have changed since the last move callback.
    * @param event The event related to the pointer changes.
    */
@@ -96,10 +99,11 @@ interface PointerTrackerCallbacks {
   /**
    * Called when a pointer is released.
    *
-   * @param pointer The final state of the pointer that ended. This
-   * pointer is now absent from this.currentPointers and
-   * this.startPointers.
+   * @param pointer The final state of the pointer that ended. This pointer is now absent from
+   * this.currentPointers and this.startPointers.
    * @param event The event related to this pointer.
+   * @param cancelled Was the action cancelled? Actions are cancelled when the OS takes over pointer
+   * events, for actions such as scrolling.
    */
   end?: EndCallback;
 }
@@ -113,8 +117,8 @@ export default class PointerTracker {
    */
   readonly startPointers: Pointer[] = [];
   /**
-   * Latest state of the tracked pointers. Contains the same number
-   * of pointers, and in the same order as this.startPointers.
+   * Latest state of the tracked pointers. Contains the same number of pointers, and in the same
+   * order as this.startPointers.
    */
   readonly currentPointers: Pointer[] = [];
 
@@ -146,6 +150,7 @@ export default class PointerTracker {
       this._element.addEventListener('touchstart', this._touchStart);
       this._element.addEventListener('touchmove', this._move);
       this._element.addEventListener('touchend', this._touchEnd);
+      this._element.addEventListener('touchcancel', this._touchEnd);
     }
   }
 
@@ -158,8 +163,10 @@ export default class PointerTracker {
     this._element.addEventListener('touchstart', this._touchStart);
     this._element.addEventListener('touchmove', this._move);
     this._element.addEventListener('touchend', this._touchEnd);
+    this._element.addEventListener('touchcancel', this._touchEnd);
     this._element.addEventListener('pointermove', this._move);
     this._element.addEventListener('pointerup', this._pointerEnd);
+    this._element.addEventListener('pointercancel', this._pointerEnd);
     window.addEventListener('mousemove', this._move);
     window.addEventListener('mouseup', this._pointerEnd);
   }
@@ -181,8 +188,7 @@ export default class PointerTracker {
   /**
    * Listener for mouse/pointer starts.
    *
-   * @param event This will only be a MouseEvent if the browser doesn't support
-   * pointer events.
+   * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
    */
   private _pointerStart = (event: PointerEvent | MouseEvent) => {
     if (event.button !== Button.Left) return;
@@ -199,6 +205,7 @@ export default class PointerTracker {
       capturingElement.setPointerCapture(event.pointerId);
       this._element.addEventListener('pointermove', this._move);
       this._element.addEventListener('pointerup', this._pointerEnd);
+      this._element.addEventListener('pointercancel', this._pointerEnd);
     } else {
       // MouseEvent
       window.addEventListener('mousemove', this._move);
@@ -256,15 +263,17 @@ export default class PointerTracker {
     this.currentPointers.splice(index, 1);
     this.startPointers.splice(index, 1);
 
-    this._endCallback(pointer, event);
+    const cancelled =
+      event.type === 'touchcancel' || event.type === 'pointercancel';
+
+    this._endCallback(pointer, event, cancelled);
     return true;
   };
 
   /**
    * Listener for mouse/pointer ends.
    *
-   * @param event This will only be a MouseEvent if the browser doesn't support
-   * pointer events.
+   * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
    */
   private _pointerEnd = (event: PointerEvent | MouseEvent) => {
     if (!this._triggerPointerEnd(new Pointer(event), event)) return;
@@ -273,6 +282,7 @@ export default class PointerTracker {
       if (this.currentPointers.length) return;
       this._element.removeEventListener('pointermove', this._move);
       this._element.removeEventListener('pointerup', this._pointerEnd);
+      this._element.removeEventListener('pointercancel', this._pointerEnd);
     } else {
       // MouseEvent
       window.removeEventListener('mousemove', this._move);

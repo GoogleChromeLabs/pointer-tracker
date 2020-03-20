@@ -22,13 +22,13 @@ export { PointerType as Pointer };
 export declare type InputEvent = TouchEvent | PointerEvent | MouseEvent;
 declare type StartCallback = (pointer: Pointer, event: InputEvent) => boolean;
 declare type MoveCallback = (previousPointers: Pointer[], changedPointers: Pointer[], event: InputEvent) => void;
-declare type EndCallback = (pointer: Pointer, event: InputEvent) => void;
+declare type EndCallback = (pointer: Pointer, event: InputEvent, cancelled: boolean) => void;
 interface PointerTrackerCallbacks {
     /**
      * Called when a pointer is pressed/touched within the element.
      *
-     * @param pointer The new pointer.
-     * This pointer isn't included in this.currentPointers or this.startPointers yet.
+     * @param pointer The new pointer. This pointer isn't included in this.currentPointers or
+     * this.startPointers yet.
      * @param event The event related to this pointer.
      *
      * @returns Whether you want to track this pointer as it moves.
@@ -37,9 +37,8 @@ interface PointerTrackerCallbacks {
     /**
      * Called when pointers have moved.
      *
-     * @param previousPointers The state of the pointers before this event.
-     * This contains the same number of pointers, in the same order, as
-     * this.currentPointers and this.startPointers.
+     * @param previousPointers The state of the pointers before this event. This contains the same
+     * number of pointers, in the same order, as this.currentPointers and this.startPointers.
      * @param changedPointers The pointers that have changed since the last move callback.
      * @param event The event related to the pointer changes.
      */
@@ -47,10 +46,11 @@ interface PointerTrackerCallbacks {
     /**
      * Called when a pointer is released.
      *
-     * @param pointer The final state of the pointer that ended. This
-     * pointer is now absent from this.currentPointers and
-     * this.startPointers.
+     * @param pointer The final state of the pointer that ended. This pointer is now absent from
+     * this.currentPointers and this.startPointers.
      * @param event The event related to this pointer.
+     * @param cancelled Was the action cancelled? Actions are cancelled when the OS takes over pointer
+     * events, for actions such as scrolling.
      */
     end?: EndCallback;
 }
@@ -64,8 +64,8 @@ export default class PointerTracker {
      */
     readonly startPointers: Pointer[];
     /**
-     * Latest state of the tracked pointers. Contains the same number
-     * of pointers, and in the same order as this.startPointers.
+     * Latest state of the tracked pointers. Contains the same number of pointers, and in the same
+     * order as this.startPointers.
      */
     readonly currentPointers: Pointer[];
     private _startCallback;
@@ -93,8 +93,7 @@ export default class PointerTracker {
     /**
      * Listener for mouse/pointer starts.
      *
-     * @param event This will only be a MouseEvent if the browser doesn't support
-     * pointer events.
+     * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
      */
     private _pointerStart;
     /**
@@ -116,8 +115,7 @@ export default class PointerTracker {
     /**
      * Listener for mouse/pointer ends.
      *
-     * @param event This will only be a MouseEvent if the browser doesn't support
-     * pointer events.
+     * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
      */
     private _pointerEnd;
     /**

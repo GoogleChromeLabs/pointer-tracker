@@ -23,11 +23,13 @@ const pointerTracker = new PointerTracker(element, {
     // changedPointers - The pointers that have changed since the last move callback.
     // event - The event related to the pointer changes.
   },
-  end(pointer, event) {
+  end(pointer, event, cancelled) {
     // Called when a pointer is released.
     // pointer - The final state of the pointer that ended. This pointer is now absent from
-    //    this.currentPointers and this.startPointers.
+    //   this.currentPointers and this.startPointers.
     // event - The event related to this pointer.
+    // cancelled - True if the event was cancelled.  Actions are cancelled when the OS takes over
+    //   pointer events, for actions such as scrolling.
   },
 });
 
@@ -70,4 +72,4 @@ const pointers = pointer.getCoalesced();
 - `lib/index.ts` - Original TypeScript.
 - `dist/PointerTracker.mjs` - JS module. Default exports PointerTracker.
 - `dist/PointerTracker.js` - Plain JS. Exposes PointerTracker on the global.
-- `dist/PointerTracker-min.js` - Minified plain JS. ~800 bytes gzipped.
+- `dist/PointerTracker-min.js` - Minified plain JS. ~770 bytes brotli'd.

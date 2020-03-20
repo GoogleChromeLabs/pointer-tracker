@@ -47,15 +47,14 @@ var PointerTracker = (function () {
              */
             this.startPointers = [];
             /**
-             * Latest state of the tracked pointers. Contains the same number
-             * of pointers, and in the same order as this.startPointers.
+             * Latest state of the tracked pointers. Contains the same number of pointers, and in the same
+             * order as this.startPointers.
              */
             this.currentPointers = [];
             /**
              * Listener for mouse/pointer starts.
              *
-             * @param event This will only be a MouseEvent if the browser doesn't support
-             * pointer events.
+             * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
              */
             this._pointerStart = (event) => {
                 if (event.button !== 0 /* Left */)
@@ -71,6 +70,7 @@ var PointerTracker = (function () {
                     capturingElement.setPointerCapture(event.pointerId);
                     this._element.addEventListener('pointermove', this._move);
                     this._element.addEventListener('pointerup', this._pointerEnd);
+                    this._element.addEventListener('pointercancel', this._pointerEnd);
                 }
                 else {
                     // MouseEvent
@@ -120,14 +120,14 @@ var PointerTracker = (function () {
                     return false;
                 this.currentPointers.splice(index, 1);
                 this.startPointers.splice(index, 1);
-                this._endCallback(pointer, event);
+                const cancelled = event.type === 'touchcancel' || event.type === 'pointercancel';
+                this._endCallback(pointer, event, cancelled);
                 return true;
             };
             /**
              * Listener for mouse/pointer ends.
              *
-             * @param event This will only be a MouseEvent if the browser doesn't support
-             * pointer events.
+             * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
              */
             this._pointerEnd = (event) => {
                 if (!this._triggerPointerEnd(new Pointer(event), event))
@@ -137,6 +137,7 @@ var PointerTracker = (function () {
                         return;
                     this._element.removeEventListener('pointermove', this._move);
                     this._element.removeEventListener('pointerup', this._pointerEnd);
+                    this._element.removeEventListener('pointercancel', this._pointerEnd);
                 }
                 else {
                     // MouseEvent
@@ -166,6 +167,7 @@ var PointerTracker = (function () {
                 this._element.addEventListener('touchstart', this._touchStart);
                 this._element.addEventListener('touchmove', this._move);
                 this._element.addEventListener('touchend', this._touchEnd);
+                this._element.addEventListener('touchcancel', this._touchEnd);
             }
         }
         /**
@@ -177,8 +179,10 @@ var PointerTracker = (function () {
             this._element.addEventListener('touchstart', this._touchStart);
             this._element.addEventListener('touchmove', this._move);
             this._element.addEventListener('touchend', this._touchEnd);
+            this._element.addEventListener('touchcancel', this._touchEnd);
             this._element.addEventListener('pointermove', this._move);
             this._element.addEventListener('pointerup', this._pointerEnd);
+            this._element.addEventListener('pointercancel', this._pointerEnd);
             window.addEventListener('mousemove', this._move);
             window.addEventListener('mouseup', this._pointerEnd);
         }
