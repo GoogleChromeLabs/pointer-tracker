@@ -134,7 +134,7 @@ export default class PointerTracker {
    */
   constructor(
     private _element: HTMLElement,
-    callbacks: PointerTrackerCallbacks,
+    callbacks: PointerTrackerCallbacks = {},
   ) {
     const { start = () => true, move = noop, end = noop } = callbacks;
 
@@ -158,17 +158,17 @@ export default class PointerTracker {
    * Remove all listeners.
    */
   stop() {
-    this._element.addEventListener('pointerdown', this._pointerStart);
-    this._element.addEventListener('mousedown', this._pointerStart);
-    this._element.addEventListener('touchstart', this._touchStart);
-    this._element.addEventListener('touchmove', this._move);
-    this._element.addEventListener('touchend', this._touchEnd);
-    this._element.addEventListener('touchcancel', this._touchEnd);
-    this._element.addEventListener('pointermove', this._move);
-    this._element.addEventListener('pointerup', this._pointerEnd);
-    this._element.addEventListener('pointercancel', this._pointerEnd);
-    window.addEventListener('mousemove', this._move);
-    window.addEventListener('mouseup', this._pointerEnd);
+    this._element.removeEventListener('pointerdown', this._pointerStart);
+    this._element.removeEventListener('mousedown', this._pointerStart);
+    this._element.removeEventListener('touchstart', this._touchStart);
+    this._element.removeEventListener('touchmove', this._move);
+    this._element.removeEventListener('touchend', this._touchEnd);
+    this._element.removeEventListener('touchcancel', this._touchEnd);
+    this._element.removeEventListener('pointermove', this._move);
+    this._element.removeEventListener('pointerup', this._pointerEnd);
+    this._element.removeEventListener('pointercancel', this._pointerEnd);
+    window.removeEventListener('mousemove', this._move);
+    window.removeEventListener('mouseup', this._pointerEnd);
   }
 
   /**
