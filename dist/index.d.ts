@@ -77,7 +77,7 @@ export default class PointerTracker {
      * @param element Element to monitor.
      * @param callbacks
      */
-    constructor(_element: HTMLElement, callbacks: PointerTrackerCallbacks);
+    constructor(_element: HTMLElement, callbacks?: PointerTrackerCallbacks);
     /**
      * Remove all listeners.
      */
