@@ -134,7 +134,7 @@ export default class PointerTracker {
    */
   constructor(
     private _element: HTMLElement,
-    callbacks: PointerTrackerCallbacks,
+    callbacks: PointerTrackerCallbacks = {},
   ) {
     const { start = () => true, move = noop, end = noop } = callbacks;
 
