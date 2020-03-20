@@ -24,25 +24,23 @@ const esm = {
 
 const iffe = {
   input: 'dist/PointerTracker.mjs',
-  output: {
-    file: 'dist/PointerTracker.js',
-    format: 'iife',
-    name: 'PointerTracker',
-  },
-};
-
-const iffeMin = {
-  input: 'dist/PointerTracker.mjs',
-  plugins: [
-    terser({
-      compress: { ecma: 6 },
-    }),
+  output: [
+    {
+      file: 'dist/PointerTracker.js',
+      format: 'iife',
+      name: 'PointerTracker',
+    },
+    {
+      plugins: [
+        terser({
+          compress: { ecma: 6 },
+        }),
+      ],
+      file: 'dist/PointerTracker-min.js',
+      format: 'iife',
+      name: 'PointerTracker',
+    },
   ],
-  output: {
-    file: 'dist/PointerTracker-min.js',
-    format: 'iife',
-    name: 'PointerTracker',
-  },
 };
 
-export default [esm, iffe, iffeMin];
+export default [esm, iffe];
