@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Simple painting app</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import PointerTracker from '../dist/PointerTracker.mjs';
+
+      const canvas = document.createElement('canvas');
+
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+      document.body.appendChild(canvas);
+      let ctx;
+
+      function setCanvasSize() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * devicePixelRatio;
+        canvas.height = rect.height * devicePixelRatio;
+        ctx = canvas.getContext('2d');
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+      }
+
+      setCanvasSize();
+      window.addEventListener('resize', setCanvasSize);
+
+      const colors = new Map();
+
+      const tracker = new PointerTracker(canvas, {
+        start(pointer, event) {
+          event.preventDefault();
+          const color = `hsl(${Math.random() * 360}, 80%, 50%)`;
+          colors.set(pointer.id, color);
+          return true;
+        },
+        end(pointer) {
+          colors.delete(pointer.id);
+        },
+        move(previousPointers, changedPointers, event) {
+          for (const pointer of changedPointers) {
+            const previous = previousPointers.find((p) => p.id === pointer.id);
+            ctx.strokeStyle = colors.get(previous.id);
+            ctx.beginPath();
+            ctx.moveTo(previous.clientX, previous.clientY);
+            for (const point of pointer.getCoalesced()) {
+              ctx.lineTo(point.clientX, point.clientY);
+            }
+            ctx.stroke();
+          }
+        },
+      });
+    </script>
+  </body>
+</html>
