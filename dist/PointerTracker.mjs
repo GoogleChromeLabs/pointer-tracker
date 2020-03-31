@@ -20,7 +20,7 @@ class Pointer {
      */
     getCoalesced() {
         if ('getCoalescedEvents' in this.nativePointer) {
-            return this.nativePointer.getCoalescedEvents().map(p => new Pointer(p));
+            return this.nativePointer.getCoalescedEvents().map((p) => new Pointer(p));
         }
         return [this];
     }
@@ -90,11 +90,11 @@ class PointerTracker {
         this._move = (event) => {
             const previousPointers = this.currentPointers.slice();
             const changedPointers = 'changedTouches' in event // Shortcut for 'is touch event'.
-                ? Array.from(event.changedTouches).map(t => new Pointer(t))
+                ? Array.from(event.changedTouches).map((t) => new Pointer(t))
                 : [new Pointer(event)];
             const trackedChangedPointers = [];
             for (const pointer of changedPointers) {
-                const index = this.currentPointers.findIndex(p => p.id === pointer.id);
+                const index = this.currentPointers.findIndex((p) => p.id === pointer.id);
                 if (index === -1)
                     continue; // Not a pointer we're tracking
                 trackedChangedPointers.push(pointer);
@@ -111,7 +111,7 @@ class PointerTracker {
          * @param event Related event
          */
         this._triggerPointerEnd = (pointer, event) => {
-            const index = this.currentPointers.findIndex(p => p.id === pointer.id);
+            const index = this.currentPointers.findIndex((p) => p.id === pointer.id);
             // Not a pointer we're interested in?
             if (index === -1)
                 return false;
