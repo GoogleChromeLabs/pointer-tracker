@@ -38,9 +38,9 @@ var PointerTracker = (function () {
          * Track pointers across a particular element
          *
          * @param element Element to monitor.
-         * @param callbacks
+         * @param options
          */
-        constructor(_element, callbacks = {}) {
+        constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, } = {}) {
             this._element = _element;
             /**
              * State of the tracked pointers when they were pressed/touched.
@@ -68,7 +68,7 @@ var PointerTracker = (function () {
                         ? event.target
                         : this._element;
                     capturingElement.setPointerCapture(event.pointerId);
-                    this._element.addEventListener('pointermove', this._move);
+                    this._element.addEventListener(this._rawUpdates ? 'pointerrawupdate' : 'pointermove', this._move);
                     this._element.addEventListener('pointerup', this._pointerEnd);
                     this._element.addEventListener('pointercancel', this._pointerEnd);
                 }
@@ -135,7 +135,7 @@ var PointerTracker = (function () {
                 if (isPointerEvent(event)) {
                     if (this.currentPointers.length)
                         return;
-                    this._element.removeEventListener('pointermove', this._move);
+                    this._element.removeEventListener(this._rawUpdates ? 'pointerrawupdate' : 'pointermove', this._move);
                     this._element.removeEventListener('pointerup', this._pointerEnd);
                     this._element.removeEventListener('pointercancel', this._pointerEnd);
                 }
@@ -154,10 +154,10 @@ var PointerTracker = (function () {
                     this._triggerPointerEnd(new Pointer(touch), event);
                 }
             };
-            const { start = () => true, move = noop, end = noop } = callbacks;
             this._startCallback = start;
             this._moveCallback = move;
             this._endCallback = end;
+            this._rawUpdates = rawUpdates && 'onpointerrawupdate' in window;
             // Add listeners
             if (self.PointerEvent) {
                 this._element.addEventListener('pointerdown', this._pointerStart);
@@ -180,7 +180,7 @@ var PointerTracker = (function () {
             this._element.removeEventListener('touchmove', this._move);
             this._element.removeEventListener('touchend', this._touchEnd);
             this._element.removeEventListener('touchcancel', this._touchEnd);
-            this._element.removeEventListener('pointermove', this._move);
+            this._element.removeEventListener(this._rawUpdates ? 'pointerrawupdate' : 'pointermove', this._move);
             this._element.removeEventListener('pointerup', this._pointerEnd);
             this._element.removeEventListener('pointercancel', this._pointerEnd);
             window.removeEventListener('mousemove', this._move);

@@ -23,7 +23,7 @@ export declare type InputEvent = TouchEvent | PointerEvent | MouseEvent;
 declare type StartCallback = (pointer: Pointer, event: InputEvent) => boolean;
 declare type MoveCallback = (previousPointers: Pointer[], changedPointers: Pointer[], event: InputEvent) => void;
 declare type EndCallback = (pointer: Pointer, event: InputEvent, cancelled: boolean) => void;
-interface PointerTrackerCallbacks {
+interface PointerTrackerOptions {
     /**
      * Called when a pointer is pressed/touched within the element.
      *
@@ -53,6 +53,11 @@ interface PointerTrackerCallbacks {
      * events, for actions such as scrolling.
      */
     end?: EndCallback;
+    /**
+     * Use raw pointer updates? Pointer events are usually synchronised to requestAnimationFrame.
+     * However, if you're targeting a desynchronised canvas, then faster 'raw' updates are better.
+     */
+    rawUpdates?: boolean;
 }
 /**
  * Track pointers across a particular element
@@ -71,13 +76,14 @@ export default class PointerTracker {
     private _startCallback;
     private _moveCallback;
     private _endCallback;
+    private _rawUpdates;
     /**
      * Track pointers across a particular element
      *
      * @param element Element to monitor.
-     * @param callbacks
+     * @param options
      */
-    constructor(_element: HTMLElement, callbacks?: PointerTrackerCallbacks);
+    constructor(_element: HTMLElement, { start, move, end, rawUpdates, }?: PointerTrackerOptions);
     /**
      * Remove all listeners.
      */

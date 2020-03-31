@@ -20,3 +20,7 @@ interface Window {
 interface PointerEvent {
   getCoalescedEvents(): PointerEvent[];
 }
+
+interface HTMLElementEventMap {
+  pointerrawupdate: PointerEvent;
+}

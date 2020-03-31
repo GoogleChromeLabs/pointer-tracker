@@ -76,7 +76,7 @@ type EndCallback = (
   cancelled: boolean,
 ) => void;
 
-interface PointerTrackerCallbacks {
+interface PointerTrackerOptions {
   /**
    * Called when a pointer is pressed/touched within the element.
    *
@@ -106,6 +106,11 @@ interface PointerTrackerCallbacks {
    * events, for actions such as scrolling.
    */
   end?: EndCallback;
+  /**
+   * Use raw pointer updates? Pointer events are usually synchronised to requestAnimationFrame.
+   * However, if you're targeting a desynchronised canvas, then faster 'raw' updates are better.
+   */
+  rawUpdates?: boolean;
 }
 
 /**
@@ -125,22 +130,27 @@ export default class PointerTracker {
   private _startCallback: StartCallback;
   private _moveCallback: MoveCallback;
   private _endCallback: EndCallback;
+  private _rawUpdates: boolean;
 
   /**
    * Track pointers across a particular element
    *
    * @param element Element to monitor.
-   * @param callbacks
+   * @param options
    */
   constructor(
     private _element: HTMLElement,
-    callbacks: PointerTrackerCallbacks = {},
+    {
+      start = () => true,
+      move = noop,
+      end = noop,
+      rawUpdates = false,
+    }: PointerTrackerOptions = {},
   ) {
-    const { start = () => true, move = noop, end = noop } = callbacks;
-
     this._startCallback = start;
     this._moveCallback = move;
     this._endCallback = end;
+    this._rawUpdates = rawUpdates && 'onpointerrawupdate' in window;
 
     // Add listeners
     if (self.PointerEvent) {
@@ -164,7 +174,10 @@ export default class PointerTracker {
     this._element.removeEventListener('touchmove', this._move);
     this._element.removeEventListener('touchend', this._touchEnd);
     this._element.removeEventListener('touchcancel', this._touchEnd);
-    this._element.removeEventListener('pointermove', this._move);
+    this._element.removeEventListener(
+      this._rawUpdates ? 'pointerrawupdate' : 'pointermove',
+      this._move,
+    );
     this._element.removeEventListener('pointerup', this._pointerEnd);
     this._element.removeEventListener('pointercancel', this._pointerEnd);
     window.removeEventListener('mousemove', this._move);
@@ -203,7 +216,10 @@ export default class PointerTracker {
           : this._element;
 
       capturingElement.setPointerCapture(event.pointerId);
-      this._element.addEventListener('pointermove', this._move);
+      this._element.addEventListener(
+        this._rawUpdates ? 'pointerrawupdate' : 'pointermove',
+        this._move,
+      );
       this._element.addEventListener('pointerup', this._pointerEnd);
       this._element.addEventListener('pointercancel', this._pointerEnd);
     } else {
@@ -280,7 +296,10 @@ export default class PointerTracker {
 
     if (isPointerEvent(event)) {
       if (this.currentPointers.length) return;
-      this._element.removeEventListener('pointermove', this._move);
+      this._element.removeEventListener(
+        this._rawUpdates ? 'pointerrawupdate' : 'pointermove',
+        this._move,
+      );
       this._element.removeEventListener('pointerup', this._pointerEnd);
       this._element.removeEventListener('pointercancel', this._pointerEnd);
     } else {

@@ -31,6 +31,10 @@ const pointerTracker = new PointerTracker(element, {
     // cancelled - True if the event was cancelled.  Actions are cancelled when the OS takes over
     //   pointer events, for actions such as scrolling.
   },
+  // Use raw pointer updates? Pointer events are usually synchronised to requestAnimationFrame.
+  // However, if you're targeting a desynchronised canvas, then faster 'raw' updates are better.
+  // The default is false.
+  rawUpdates: false,
 });
 
 // State of the tracked pointers when they were pressed/touched.
