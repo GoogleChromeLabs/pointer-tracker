@@ -22,12 +22,12 @@ const esm = {
   },
 };
 
-const iffe = {
+const umd = {
   input: 'dist/PointerTracker.mjs',
   output: [
     {
       file: 'dist/PointerTracker.js',
-      format: 'iife',
+      format: 'umd',
       name: 'PointerTracker',
     },
     {
@@ -37,10 +37,10 @@ const iffe = {
         }),
       ],
       file: 'dist/PointerTracker-min.js',
-      format: 'iife',
+      format: 'umd',
       name: 'PointerTracker',
     },
   ],
 };
 
-export default [esm, iffe];
+export default [esm, umd];
