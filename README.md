@@ -75,5 +75,5 @@ const pointers = pointer.getCoalesced();
 
 - `lib/index.ts` - Original TypeScript.
 - `dist/PointerTracker.mjs` - JS module. Default exports PointerTracker.
-- `dist/PointerTracker.js` - Plain JS. Exposes PointerTracker on the global.
-- `dist/PointerTracker-min.js` - Minified plain JS. ~770 bytes brotli'd.
+- `dist/PointerTracker.js` - UMD JS. Exposes PointerTracker on the global by default.
+- `dist/PointerTracker-min.js` - Minified UMD JS. ~900 bytes brotli'd.
