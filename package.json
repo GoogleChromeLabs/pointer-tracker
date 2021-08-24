@@ -5,6 +5,14 @@
   "main": "dist/PointerTracker.js",
   "module": "dist/PointerTracker.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/PointerTracker.js",
+      "import": "./dist/PointerTracker.mjs"
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "rm -rf dist && rollup -c"
   },

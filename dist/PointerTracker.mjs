@@ -37,7 +37,7 @@ class PointerTracker {
      * @param element Element to monitor.
      * @param options
      */
-    constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, } = {}) {
+    constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, avoidPointerEvents = false, } = {}) {
         this._element = _element;
         /**
          * State of the tracked pointers when they were pressed/touched.
@@ -156,7 +156,7 @@ class PointerTracker {
         this._endCallback = end;
         this._rawUpdates = rawUpdates && 'onpointerrawupdate' in window;
         // Add listeners
-        if (self.PointerEvent) {
+        if (self.PointerEvent && !avoidPointerEvents) {
             this._element.addEventListener('pointerdown', this._pointerStart);
         }
         else {

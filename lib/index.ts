@@ -107,8 +107,18 @@ interface PointerTrackerOptions {
    */
   end?: EndCallback;
   /**
+   * Avoid pointer events in favour of touch and mouse events?
+   *
+   * Even if the browser supports pointer events, you may want to force the browser to use
+   * mouse/touch fallbacks, to work around bugs such as
+   * https://bugs.webkit.org/show_bug.cgi?id=220196.
+   */
+  avoidPointerEvents?: boolean;
+  /**
    * Use raw pointer updates? Pointer events are usually synchronised to requestAnimationFrame.
    * However, if you're targeting a desynchronised canvas, then faster 'raw' updates are better.
+   *
+   * This feature only applies to pointer events.
    */
   rawUpdates?: boolean;
 }
@@ -145,6 +155,7 @@ export default class PointerTracker {
       move = noop,
       end = noop,
       rawUpdates = false,
+      avoidPointerEvents = false,
     }: PointerTrackerOptions = {},
   ) {
     this._startCallback = start;
@@ -153,7 +164,7 @@ export default class PointerTracker {
     this._rawUpdates = rawUpdates && 'onpointerrawupdate' in window;
 
     // Add listeners
-    if (self.PointerEvent) {
+    if (self.PointerEvent && !avoidPointerEvents) {
       this._element.addEventListener('pointerdown', this._pointerStart);
     } else {
       this._element.addEventListener('mousedown', this._pointerStart);
