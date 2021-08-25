@@ -12,24 +12,35 @@ import PointerTracker from 'pointer-tracker';
 const pointerTracker = new PointerTracker(element, {
   start(pointer, event) {
     // Called when a pointer is pressed/touched within the element.
+    //
     // pointer - The new pointer. This pointer isn't included in this.currentPointers or
-    //    this.startPointers yet.
+    // this.startPointers yet.
+    //
     // event - The event related to this pointer.
+    //
+    // Return true from this callback if you're interested in further events about this pointer,
+    // such as 'move' and 'end'.
   },
   move(previousPointers, changedPointers, event) {
     // Called when pointers have moved.
+    //
     // previousPointers - The state of the pointers before this event. This contains the same number
-    //   of pointers, in the same order, as this.currentPointers and this.startPointers.
+    // of pointers, in the same order, as this.currentPointers and this.startPointers.
+    //
     // changedPointers - The pointers that have changed since the last move callback.
+    //
     // event - The event related to the pointer changes.
   },
   end(pointer, event, cancelled) {
     // Called when a pointer is released.
+    //
     // pointer - The final state of the pointer that ended. This pointer is now absent from
-    //   this.currentPointers and this.startPointers.
+    // this.currentPointers and this.startPointers.
+    //
     // event - The event related to this pointer.
+    //
     // cancelled - True if the event was cancelled.  Actions are cancelled when the OS takes over
-    //   pointer events, for actions such as scrolling.
+    // pointer events, for actions such as scrolling.
   },
   // Avoid pointer events in favour of touch and mouse events?
   //
