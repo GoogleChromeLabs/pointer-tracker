@@ -33,13 +33,13 @@
   },
   "homepage": "https://github.com/GoogleChromeLabs/pointer-tracker#readme",
   "devDependencies": {
-    "husky": "^4.2.5",
-    "lint-staged": "^10.2.11",
-    "prettier": "^2.0.5",
-    "rollup": "^2.23.1",
-    "rollup-plugin-terser": "^7.0.0",
-    "rollup-plugin-typescript2": "^0.27.2",
-    "typescript": "^3.9.7"
+    "husky": "^7.0.2",
+    "lint-staged": "^11.1.2",
+    "prettier": "^2.3.2",
+    "rollup": "^2.56.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "typescript": "^4.3.5"
   },
   "dependencies": {},
   "husky": {

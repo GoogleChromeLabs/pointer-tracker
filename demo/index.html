@@ -29,7 +29,6 @@
 
       const canvas = document.createElement('canvas');
 
-      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
       document.body.appendChild(canvas);
       let ctx;
 
@@ -50,15 +49,18 @@
 
       const tracker = new PointerTracker(canvas, {
         start(pointer, event) {
+          console.log('start', pointer);
           event.preventDefault();
           const color = `hsl(${Math.random() * 360}, 80%, 50%)`;
           colors.set(pointer.id, color);
           return true;
         },
-        end(pointer) {
+        end(pointer, event, cancelled) {
+          console.log('end', { cancelled }, pointer);
           colors.delete(pointer.id);
         },
         move(previousPointers, changedPointers, event) {
+          console.log('move');
           for (const pointer of changedPointers) {
             const previous = previousPointers.find((p) => p.id === pointer.id);
             ctx.strokeStyle = colors.get(previous.id);
@@ -70,6 +72,8 @@
             ctx.stroke();
           }
         },
+        avoidPointerEvents: false,
+        rawUpdates: false,
       });
     </script>
   </body>

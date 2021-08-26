@@ -10,8 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const enum Button {
-  Left,
+const enum Buttons {
+  None,
+  LeftMouseOrTouchOrPenDown,
 }
 
 class Pointer {
@@ -59,7 +60,10 @@ type PointerType = Pointer;
 export { PointerType as Pointer };
 
 const isPointerEvent = (event: any): event is PointerEvent =>
-  self.PointerEvent && event instanceof PointerEvent;
+  'pointerId' in event;
+
+const isTouchEvent = (event: any): event is TouchEvent =>
+  'changedTouches' in event;
 
 const noop = () => {};
 
@@ -215,8 +219,13 @@ export default class PointerTracker {
    * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
    */
   private _pointerStart = (event: PointerEvent | MouseEvent) => {
-    if (event.button !== Button.Left) return;
-    if (!this._triggerPointerStart(new Pointer(event), event)) return;
+    if (!(event.buttons & Buttons.LeftMouseOrTouchOrPenDown)) return;
+    const pointer = new Pointer(event);
+    // If we're already tracking this pointer, ignore this event.
+    // This happens with mouse events when multiple buttons are pressed.
+    if (this.currentPointers.some((p) => p.id === pointer.id)) return;
+
+    if (!this._triggerPointerStart(pointer, event)) return;
 
     // Add listeners for additional events.
     // The listeners may already exist, but no harm in adding them again.
@@ -254,11 +263,18 @@ export default class PointerTracker {
    * Listener for pointer/mouse/touch move events.
    */
   private _move = (event: PointerEvent | MouseEvent | TouchEvent) => {
+    if (!isTouchEvent(event) && event.buttons === Buttons.None) {
+      // This happens in a number of buggy cases where the browser failed to deliver a pointerup
+      // or pointercancel. If we see the pointer moving without any buttons down, synthesize an end.
+      // https://github.com/w3c/pointerevents/issues/407
+      // https://github.com/w3c/pointerevents/issues/408
+      this._pointerEnd(event);
+      return;
+    }
     const previousPointers = this.currentPointers.slice();
-    const changedPointers =
-      'changedTouches' in event // Shortcut for 'is touch event'.
-        ? Array.from(event.changedTouches).map((t) => new Pointer(t))
-        : [new Pointer(event)];
+    const changedPointers = isTouchEvent(event)
+      ? Array.from(event.changedTouches).map((t) => new Pointer(t))
+      : [new Pointer(event)];
     const trackedChangedPointers = [];
 
     for (const pointer of changedPointers) {
@@ -283,6 +299,14 @@ export default class PointerTracker {
     pointer: Pointer,
     event: InputEvent,
   ): boolean => {
+    // Main button still down?
+    // With mouse events, you get a mouseup per mouse button, so the left button might still be down.
+    if (
+      !isTouchEvent(event) &&
+      event.buttons & Buttons.LeftMouseOrTouchOrPenDown
+    ) {
+      return false;
+    }
     const index = this.currentPointers.findIndex((p) => p.id === pointer.id);
     // Not a pointer we're interested in?
     if (index === -1) return false;
@@ -290,8 +314,13 @@ export default class PointerTracker {
     this.currentPointers.splice(index, 1);
     this.startPointers.splice(index, 1);
 
-    const cancelled =
-      event.type === 'touchcancel' || event.type === 'pointercancel';
+    // The event.type might be a 'move' event due to workarounds for weird mouse behaviour.
+    // See _move for details.
+    const cancelled = !(
+      event.type === 'mouseup' ||
+      event.type === 'touchend' ||
+      event.type === 'pointerup'
+    );
 
     this._endCallback(pointer, event, cancelled);
     return true;

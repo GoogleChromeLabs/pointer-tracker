@@ -39,7 +39,7 @@ const pointerTracker = new PointerTracker(element, {
     //
     // event - The event related to this pointer.
     //
-    // cancelled - True if the event was cancelled.  Actions are cancelled when the OS takes over
+    // cancelled - True if the event was cancelled. Actions are cancelled when the OS takes over
     // pointer events, for actions such as scrolling.
   },
   // Avoid pointer events in favour of touch and mouse events?
