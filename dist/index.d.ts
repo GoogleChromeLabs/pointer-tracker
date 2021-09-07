@@ -88,6 +88,14 @@ export default class PointerTracker {
     private _endCallback;
     private _rawUpdates;
     /**
+     * Firefox has a bug where touch-based pointer events have a `buttons` of 0, when this shouldn't
+     * happen. https://bugzilla.mozilla.org/show_bug.cgi?id=1729440
+     *
+     * Usually we treat `buttons === 0` as no-longer-pressed. This set allows us to exclude these
+     * buggy Firefox events.
+     */
+    private _excludeFromButtonsCheck;
+    /**
      * Track pointers across a particular element
      *
      * @param element Element to monitor.

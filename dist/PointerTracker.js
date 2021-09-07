@@ -26,7 +26,13 @@
          */
         getCoalesced() {
             if ('getCoalescedEvents' in this.nativePointer) {
-                return this.nativePointer.getCoalescedEvents().map((p) => new Pointer(p));
+                const events = this.nativePointer
+                    .getCoalescedEvents()
+                    .map((p) => new Pointer(p));
+                // Firefox sometimes returns an empty list here. I'm not sure it's doing the right thing.
+                // https://github.com/w3c/pointerevents/issues/409
+                if (events.length > 0)
+                    return events;
             }
             return [this];
         }
@@ -56,13 +62,26 @@
              */
             this.currentPointers = [];
             /**
+             * Firefox has a bug where touch-based pointer events have a `buttons` of 0, when this shouldn't
+             * happen. https://bugzilla.mozilla.org/show_bug.cgi?id=1729440
+             *
+             * Usually we treat `buttons === 0` as no-longer-pressed. This set allows us to exclude these
+             * buggy Firefox events.
+             */
+            this._excludeFromButtonsCheck = new Set();
+            /**
              * Listener for mouse/pointer starts.
              *
              * @param event This will only be a MouseEvent if the browser doesn't support pointer events.
              */
             this._pointerStart = (event) => {
-                if (!(event.buttons & 1 /* LeftMouseOrTouchOrPenDown */))
+                if (isPointerEvent(event) && event.buttons === 0) {
+                    // This is the buggy Firefox case. See _excludeFromButtonsCheck.
+                    this._excludeFromButtonsCheck.add(event.pointerId);
+                }
+                else if (!(event.buttons & 1 /* LeftMouseOrTouchOrPenDown */)) {
                     return;
+                }
                 const pointer = new Pointer(event);
                 // If we're already tracking this pointer, ignore this event.
                 // This happens with mouse events when multiple buttons are pressed.
@@ -100,7 +119,10 @@
              * Listener for pointer/mouse/touch move events.
              */
             this._move = (event) => {
-                if (!isTouchEvent(event) && event.buttons === 0 /* None */) {
+                if (!isTouchEvent(event) &&
+                    (!isPointerEvent(event) ||
+                        !this._excludeFromButtonsCheck.has(event.pointerId)) &&
+                    event.buttons === 0 /* None */) {
                     // This happens in a number of buggy cases where the browser failed to deliver a pointerup
                     // or pointercancel. If we see the pointer moving without any buttons down, synthesize an end.
                     // https://github.com/w3c/pointerevents/issues/407
@@ -143,6 +165,7 @@
                     return false;
                 this.currentPointers.splice(index, 1);
                 this.startPointers.splice(index, 1);
+                this._excludeFromButtonsCheck.delete(pointer.id);
                 // The event.type might be a 'move' event due to workarounds for weird mouse behaviour.
                 // See _move for details.
                 const cancelled = !(event.type === 'mouseup' ||
