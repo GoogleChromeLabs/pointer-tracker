@@ -55,6 +55,11 @@ const pointerTracker = new PointerTracker(element, {
   //
   // This feature only applies to pointer events. The default is false.
   rawUpdates: false,
+  // Set the event listener opitons
+  // For example, set { capture: true } if you want to capture the event before it reaches listeners
+  // below yours in the DOM tree.
+  // For details, see: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#parameters
+  eventListenerOptions: { capture: false, passive: false, once: false },
 });
 
 // State of the tracked pointers when they were pressed/touched.
