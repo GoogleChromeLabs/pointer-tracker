@@ -1,6 +1,6 @@
 {
   "name": "pointer-tracker",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "description": "Track mouse/touch/pointer events through one interface",
   "main": "dist/PointerTracker.js",
   "module": "dist/PointerTracker.mjs",
