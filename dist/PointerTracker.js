@@ -33,6 +33,7 @@
                 // https://github.com/w3c/pointerevents/issues/409
                 if (events.length > 0)
                     return events;
+                // Otherwise, Firefox falls through…
             }
             return [this];
         }
@@ -50,7 +51,7 @@
          * @param element Element to monitor.
          * @param options
          */
-        constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, avoidPointerEvents = false, } = {}) {
+        constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, avoidPointerEvents = false, eventListenerOptions = { capture: false, passive: false, once: false }, } = {}) {
             this._element = _element;
             /**
              * State of the tracked pointers when they were pressed/touched.
@@ -96,9 +97,9 @@
                         ? event.target
                         : this._element;
                     capturingElement.setPointerCapture(event.pointerId);
-                    this._element.addEventListener(this._rawUpdates ? 'pointerrawupdate' : 'pointermove', this._move);
-                    this._element.addEventListener('pointerup', this._pointerEnd);
-                    this._element.addEventListener('pointercancel', this._pointerEnd);
+                    this._element.addEventListener(this._rawUpdates ? 'pointerrawupdate' : 'pointermove', this._move, this._eventListenerOptions);
+                    this._element.addEventListener('pointerup', this._pointerEnd, this._eventListenerOptions);
+                    this._element.addEventListener('pointercancel', this._pointerEnd, this._eventListenerOptions);
                 }
                 else {
                     // MouseEvent
@@ -208,16 +209,17 @@
             this._moveCallback = move;
             this._endCallback = end;
             this._rawUpdates = rawUpdates && 'onpointerrawupdate' in window;
+            this._eventListenerOptions = eventListenerOptions;
             // Add listeners
             if (self.PointerEvent && !avoidPointerEvents) {
-                this._element.addEventListener('pointerdown', this._pointerStart);
+                this._element.addEventListener('pointerdown', this._pointerStart, this._eventListenerOptions);
             }
             else {
-                this._element.addEventListener('mousedown', this._pointerStart);
-                this._element.addEventListener('touchstart', this._touchStart);
-                this._element.addEventListener('touchmove', this._move);
-                this._element.addEventListener('touchend', this._touchEnd);
-                this._element.addEventListener('touchcancel', this._touchEnd);
+                this._element.addEventListener('mousedown', this._pointerStart, this._eventListenerOptions);
+                this._element.addEventListener('touchstart', this._touchStart, this._eventListenerOptions);
+                this._element.addEventListener('touchmove', this._move, this._eventListenerOptions);
+                this._element.addEventListener('touchend', this._touchEnd, this._eventListenerOptions);
+                this._element.addEventListener('touchcancel', this._touchEnd, this._eventListenerOptions);
             }
         }
         /**
