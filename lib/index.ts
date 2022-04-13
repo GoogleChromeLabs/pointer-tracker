@@ -87,9 +87,9 @@ type EndCallback = (
 ) => void;
 
 type eventListenerOptions = {
-  capture: boolean;
-  passive: boolean;
-  once: boolean;
+  capture?: boolean;
+  passive?: boolean;
+  once?: boolean;
 };
 
 interface PointerTrackerOptions {
