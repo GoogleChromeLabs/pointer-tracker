@@ -24,9 +24,9 @@ declare type StartCallback = (pointer: Pointer, event: InputEvent) => boolean;
 declare type MoveCallback = (previousPointers: Pointer[], changedPointers: Pointer[], event: InputEvent) => void;
 declare type EndCallback = (pointer: Pointer, event: InputEvent, cancelled: boolean) => void;
 declare type eventListenerOptions = {
-    capture: boolean;
-    passive: boolean;
-    once: boolean;
+    capture?: boolean;
+    passive?: boolean;
+    once?: boolean;
 };
 interface PointerTrackerOptions {
     /**
