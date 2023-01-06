@@ -86,6 +86,12 @@ type EndCallback = (
   cancelled: boolean,
 ) => void;
 
+type eventListenerOptions = {
+  capture?: boolean;
+  passive?: boolean;
+  once?: boolean;
+};
+
 interface PointerTrackerOptions {
   /**
    * Called when a pointer is pressed/touched within the element.
@@ -131,6 +137,11 @@ interface PointerTrackerOptions {
    * This feature only applies to pointer events.
    */
   rawUpdates?: boolean;
+  /**
+   * Set the options of the event listener: capture, passive, and once.
+   * See: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#parameters
+   */
+  eventListenerOptions?: eventListenerOptions;
 }
 
 /**
@@ -151,6 +162,7 @@ export default class PointerTracker {
   private _moveCallback: MoveCallback;
   private _endCallback: EndCallback;
   private _rawUpdates: boolean;
+  private _eventListenerOptions: eventListenerOptions;
 
   /**
    * Firefox has a bug where touch-based pointer events have a `buttons` of 0, when this shouldn't
@@ -175,22 +187,48 @@ export default class PointerTracker {
       end = noop,
       rawUpdates = false,
       avoidPointerEvents = false,
+      eventListenerOptions = { capture: false, passive: false, once: false },
     }: PointerTrackerOptions = {},
   ) {
     this._startCallback = start;
     this._moveCallback = move;
     this._endCallback = end;
     this._rawUpdates = rawUpdates && 'onpointerrawupdate' in window;
+    this._eventListenerOptions = eventListenerOptions;
 
     // Add listeners
     if (self.PointerEvent && !avoidPointerEvents) {
-      this._element.addEventListener('pointerdown', this._pointerStart);
+      this._element.addEventListener(
+        'pointerdown',
+        this._pointerStart,
+        this._eventListenerOptions,
+      );
     } else {
-      this._element.addEventListener('mousedown', this._pointerStart);
-      this._element.addEventListener('touchstart', this._touchStart);
-      this._element.addEventListener('touchmove', this._move);
-      this._element.addEventListener('touchend', this._touchEnd);
-      this._element.addEventListener('touchcancel', this._touchEnd);
+      this._element.addEventListener(
+        'mousedown',
+        this._pointerStart,
+        this._eventListenerOptions,
+      );
+      this._element.addEventListener(
+        'touchstart',
+        this._touchStart,
+        this._eventListenerOptions,
+      );
+      this._element.addEventListener(
+        'touchmove',
+        this._move,
+        this._eventListenerOptions,
+      );
+      this._element.addEventListener(
+        'touchend',
+        this._touchEnd,
+        this._eventListenerOptions,
+      );
+      this._element.addEventListener(
+        'touchcancel',
+        this._touchEnd,
+        this._eventListenerOptions,
+      );
     }
   }
 
@@ -259,9 +297,18 @@ export default class PointerTracker {
       this._element.addEventListener(
         this._rawUpdates ? 'pointerrawupdate' : 'pointermove',
         this._move,
+        this._eventListenerOptions,
       );
-      this._element.addEventListener('pointerup', this._pointerEnd);
-      this._element.addEventListener('pointercancel', this._pointerEnd);
+      this._element.addEventListener(
+        'pointerup',
+        this._pointerEnd,
+        this._eventListenerOptions,
+      );
+      this._element.addEventListener(
+        'pointercancel',
+        this._pointerEnd,
+        this._eventListenerOptions,
+      );
     } else {
       // MouseEvent
       window.addEventListener('mousemove', this._move);

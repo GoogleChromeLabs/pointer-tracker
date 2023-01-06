@@ -7,7 +7,7 @@ Track mouse/touch/pointer events for a given element.
 ### PointerTracker
 
 ```js
-import PointerTracker from 'pointer-tracker';
+import PointerTracker from '@douganderson444/pointer-tracker';
 
 const pointerTracker = new PointerTracker(element, {
   start(pointer, event) {
@@ -55,6 +55,11 @@ const pointerTracker = new PointerTracker(element, {
   //
   // This feature only applies to pointer events. The default is false.
   rawUpdates: false,
+  // Set the event listener options
+  // For example, set { capture: true } if you want to capture the event before it reaches listeners
+  // below yours in the DOM tree.
+  // For details, see: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#parameters
+  eventListenerOptions: { capture?: false, passive?: false, once?: false },
 });
 
 // State of the tracked pointers when they were pressed/touched.

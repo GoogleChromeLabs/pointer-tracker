@@ -23,6 +23,11 @@ export declare type InputEvent = TouchEvent | PointerEvent | MouseEvent;
 declare type StartCallback = (pointer: Pointer, event: InputEvent) => boolean;
 declare type MoveCallback = (previousPointers: Pointer[], changedPointers: Pointer[], event: InputEvent) => void;
 declare type EndCallback = (pointer: Pointer, event: InputEvent, cancelled: boolean) => void;
+declare type eventListenerOptions = {
+    capture?: boolean;
+    passive?: boolean;
+    once?: boolean;
+};
 interface PointerTrackerOptions {
     /**
      * Called when a pointer is pressed/touched within the element.
@@ -68,6 +73,11 @@ interface PointerTrackerOptions {
      * This feature only applies to pointer events.
      */
     rawUpdates?: boolean;
+    /**
+     * Set the options of the event listener: capture, passive, and once.
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#parameters
+     */
+    eventListenerOptions?: eventListenerOptions;
 }
 /**
  * Track pointers across a particular element
@@ -87,6 +97,7 @@ export default class PointerTracker {
     private _moveCallback;
     private _endCallback;
     private _rawUpdates;
+    private _eventListenerOptions;
     /**
      * Firefox has a bug where touch-based pointer events have a `buttons` of 0, when this shouldn't
      * happen. https://bugzilla.mozilla.org/show_bug.cgi?id=1729440
@@ -101,7 +112,7 @@ export default class PointerTracker {
      * @param element Element to monitor.
      * @param options
      */
-    constructor(_element: HTMLElement, { start, move, end, rawUpdates, avoidPointerEvents, }?: PointerTrackerOptions);
+    constructor(_element: HTMLElement, { start, move, end, rawUpdates, avoidPointerEvents, eventListenerOptions, }?: PointerTrackerOptions);
     /**
      * Remove all listeners.
      */
