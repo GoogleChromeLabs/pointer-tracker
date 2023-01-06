@@ -7,7 +7,7 @@ Track mouse/touch/pointer events for a given element.
 ### PointerTracker
 
 ```js
-import PointerTracker from 'pointer-tracker';
+import PointerTracker from '@douganderson444/pointer-tracker';
 
 const pointerTracker = new PointerTracker(element, {
   start(pointer, event) {
