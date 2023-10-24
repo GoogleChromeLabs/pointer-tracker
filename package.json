@@ -8,6 +8,7 @@
   "exports": {
     ".": {
       "require": "./dist/PointerTracker.js",
+      "types": "./dist/index.d.ts",
       "import": "./dist/PointerTracker.mjs"
     },
     "./dist/*": "./dist/*",
